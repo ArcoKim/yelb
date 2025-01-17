@@ -1,12 +1,9 @@
-This is the user interface module. It's an Angular2 application that uses the VMware open source [Clarity framework](https://clarity.design/).
+# Yelb Ui
 
-The way this works may be a bit cumbersome. I basically clone the Clarity seed, I check out a specific commit (one that I have tested) and then copy/replace the files that are in the directory `clarity-seed-newfiles`. These files are both code and configuration of my app. You can look at the mechanics of how this happens either in the `Dockerfile` in this directory or in the `yelb-ui.sh` script in the `deployments/platformdeployment/Linux` directory. 
+사용자가 사이트를 이용할 수 있는 Angular2 애플리케이션입니다. 포트는 80으로 고정됩니다.
+직접 빌드하거나, mreferre/yelb-ui:0.10 이미지를 사용하면 됩니다.
 
-Depending on the deployment model being used, the compiling of the Angular2 application happens at different times. 
-
-For the EC2 deployment model, the UI gets compiled at deployment time via running the setup via cloud-init scripts. This is why the app may take a while to become available even though the CFN stack says it's all green and good. The instance where the UI is deployed takes about 5 minutes (or more depending on the instance type) to compile everything and start vending the javascript code. 
-
-For the container deployment model, the UI gets compiled at container image build time. This actually uses a two phase build where the resulting javascript code is copied into a brand new image based off of the `nginx` official image. Check out the Dockerfile to see how that works. 
-
-For the serverless Lambda deployment model the UI gets compiled once and pushed to an S3 bucket. This (public) bucket is then used as a source for deploying a new bucket that vends the code to the browser that makes the request. This requires an additional tweak because by default the application is configured to use the IP/FQDN of the UI web server to make the application API calls. This works fine for the EC2 and container deployments because the nginx will act as a proxy but in this case the UI needs to be pre-configured with the end-point of the API Gateway that makes available the API calls (which in turns call the Lambdas). Check out the serverless deployment model for more details on how that tweak works. 
-
+## 환경변수 설명
+SEARCH_DOMAIN을 설정했을 때 나머지 환경변수를 설정하면 오류가 생길 수 있습니다.
+- SEARCH_DOMAIN : yelb-appserver를 호출할 때 Base Domain을 설정합니다. (예시 : yelb.local로 설정했을 때 yelb-appserver.yelb.local을 고정으로 호출합니다.)
+- YELB_APPSERVER_ENDPOINT : yelb-appserver 엔드포인트를 설정합니다. 프로토콜과 포트를 모두 포함한 주소여야 합니다. (예시 : http://yelb-appserver.yelb.local:4567)
